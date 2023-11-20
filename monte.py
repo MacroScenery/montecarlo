@@ -2,6 +2,9 @@
 # 5.10 page 150
 import random # use random.random()
 
+# Computer Object
+# Virus stores if computer has virus or not
+# Was infected stroes if computer has been infected ever
 class Computer:
   def __init__(self, virus=False, wasInfected=False):
     self.virus = virus
@@ -25,26 +28,31 @@ def printNetwork(network, headerText=""):
 
 def repairNetwork(network, numberOfRepairs):
  
+    # split into infected computers
     infectedComputers = [computer for computer in network if computer.virus]
-    
+
     while (numberOfRepairs > 0  and len(infectedComputers) > 0):
-        index = int(random.random() * len(infectedComputers))
-        infectedComputers[index].virus = False
-        infectedComputers.pop(index)
+        index = int(random.random() * len(infectedComputers)) # choose an infected computer randomly
+        infectedComputers[index].virus = False # make it noninfected
+        infectedComputers.pop(index) # remove it from the list
         numberOfRepairs -= 1
 
     return network
 
 def nextStateVirus(network, p):
+    # Split computers in to noninfected and infected computers
     infectedComputers = [computer for computer in network if computer.virus]
     noninfectedComputers = [computer for computer in network if not computer.virus]
 
+    # For each virus
     for virus in infectedComputers:
+        # Each virus has a chance of spreading to any of the noninfected computers
         for i in range(len(noninfectedComputers)):
-            if random.random() < p:
+            if random.random() < p: # if the random chance occurs
+                # Set virus to be true
                 noninfectedComputers[i].virus = True
-                if (noninfectedComputers[i].wasInfected == False):
-                    noninfectedComputers[i].wasInfected = True
+                if (noninfectedComputers[i].wasInfected == False): # if first infection
+                    noninfectedComputers[i].wasInfected = True # set was infected
 
 
 
@@ -57,10 +65,8 @@ def nextStateVirus(network, p):
 # Runs through one state of network and returns new network
 # Takes in a network array of booleans, proability of virus p
 def nextState(network, p, numberOfRepairs):
-    network = nextStateVirus(network, p)
-    #printNetwork(network, headerText="Post-Virus")
-    network = repairNetwork(network, numberOfRepairs)
-    #printNetwork(network, headerText="Post-Repair")
+    network = nextStateVirus(network, p) # Virus infections
+    network = repairNetwork(network, numberOfRepairs) # Computer Repairs
     return network
 
 def simulation(networkSize=20, p=0.1, numberOfRepairs=5):
@@ -70,20 +76,19 @@ def simulation(networkSize=20, p=0.1, numberOfRepairs=5):
 
     dayCounter = 0
 
-    while (numberOfInfected > 0):
+    while (numberOfInfected > 0): # while there are still viruses
         #print("Day:" + str(dayCounter))
         numberOfInfected = 0
-        network = nextState(network, p, numberOfRepairs)
+        network = nextState(network, p, numberOfRepairs) # run the states
         for computer in network:
             if computer.virus == True:
-                numberOfInfected += 1
+                numberOfInfected += 1 # check how many computers are infected
         
         dayCounter += 1
         
 
     return (network, dayCounter)
 
-# TODO: Fix statictis B and C
 def monteCarlo(n, networkSize=20, p=0.1, numberOfRepairs=5):
 
     avgNumberOfDaysTillClean = 0.0 # Part A
@@ -92,17 +97,17 @@ def monteCarlo(n, networkSize=20, p=0.1, numberOfRepairs=5):
 
     for i in range(n):
         print("Running simulation " + str(i+1))
-        postNetwork, days = simulation(networkSize, p, numberOfRepairs)
+        postNetwork, days = simulation(networkSize, p, numberOfRepairs) # run a simultaion, return network and number of days it takes
         print("Calculating stats " + str(i+1))
         avgNumberOfDaysTillClean += days
-        
-        counter = 0
+
+        counter = 0 # number of computers infected this simulation
         for computer in postNetwork:
             if computer.wasInfected == True:
-                meanInfect += 1
+                meanInfect += 1 # add to stat C
                 
                 counter += 1
-                if (counter == networkSize):
+                if (counter == networkSize): # if all computers have been infected
                     infectedAtLeastOnce += 1
 
 
@@ -112,18 +117,18 @@ def monteCarlo(n, networkSize=20, p=0.1, numberOfRepairs=5):
     infectedAtLeastOnce /= float(n)
     meanInfect /= float(n)
 
-    # Part A
-    print("Mean number of days till virus is gone: " + str(avgNumberOfDaysTillClean))
-    print("Proability of times each computer was infected at least once " + str(infectedAtLeastOnce))
-    print("Mean number of computers infected " + str(meanInfect))
-
-
     # X = # of computers vistied by virus
+    # Y = # of days to clean virus from network
 
+    # Part A Average number of days till virus is gone
+        # Part A -> E(Y)
+    print("Mean number of days till virus is gone: " + str(avgNumberOfDaysTillClean))
     # Part B all computers must have been infected (at least one time)
         # Part B -> P{X=20}
+    print("Proability of times each computer was infected at least once " + "{0:.4f}".format(infectedAtLeastOnce))
     # Part C is just number that get infected at least in general
         # Part C -> E(X)
+    print("Mean number of computers infected " + str(meanInfect))
 
 
 
