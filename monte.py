@@ -6,7 +6,7 @@ class Computer:
   def __init__(self, virus=False, wasInfected=False):
     self.virus = virus
     self.wasInfected = wasInfected
-  
+
   def __str__(self):
         return "{" + str(self.virus) + ", " + str(self.wasInfected) + "}"
 
@@ -83,55 +83,70 @@ def simulation(networkSize=20, p=0.1, numberOfRepairs=5):
 
     return (network, dayCounter)
 
+# TODO: Fix statictis B and C
 def monteCarlo(n, networkSize=20, p=0.1, numberOfRepairs=5):
 
-    avgNumberOfDaysTillClean = 0.0
-    probabilityInfectOnce = 0.0
-    expectedComputersInfected = 0.0
+    avgNumberOfDaysTillClean = 0.0 # Part A
+    infectedAtLeastOnce = 0.0 # Part B
+    meanInfect = 0.0 # Part C
 
     for i in range(n):
         print("Running simulation " + str(i+1))
         postNetwork, days = simulation(networkSize, p, numberOfRepairs)
-
         print("Calculating stats " + str(i+1))
         avgNumberOfDaysTillClean += days
         
+        counter = 0
         for computer in postNetwork:
             if computer.wasInfected == True:
-                probabilityInfectOnce += 1
+                meanInfect += 1
+                
+                counter += 1
+                if (counter == networkSize):
+                    infectedAtLeastOnce += 1
+
+
 
     
     avgNumberOfDaysTillClean /= float(n)
+    infectedAtLeastOnce /= float(n)
+    meanInfect /= float(n)
 
-    probabilityInfectOnce /= float(networkSize * n)
+    # Part A
+    print("Mean number of days till virus is gone: " + str(avgNumberOfDaysTillClean))
+    print("Proability of times each computer was infected at least once " + str(infectedAtLeastOnce))
+    print("Mean number of computers infected " + str(meanInfect))
 
-    print(avgNumberOfDaysTillClean)
-    print(probabilityInfectOnce)
+
+    # X = # of computers vistied by virus
+
+    # Part B all computers must have been infected (at least one time)
+        # Part B -> P{X=20}
+    # Part C is just number that get infected at least in general
+        # Part C -> E(X)
 
 
 
 
 def main():
-    monteCarlo(1000)
-    
-    # network = [Computer() for _ in range(20)]
-    # network[ int(random.random() * 20) ] = Computer(True, True) # create network and make one random computer infected
-    # printNetwork(network, "Pre-Virus")
-    # network = nextStateVirus(network, 0.5)
-    # printNetwork(network, "Post-Virus")
-    # n = 0
-    # for computer in network:
-    #     if computer.virus == True:
-    #         n+=1
-    # print(n)
+    while (True):
+        print("Welcome to Monte Carlo Simulator")
+        print("Opts:")
+        print("1. Run Defualt Simulation (network = 20, p = 0.1, repairs = 5)")
+        print("2. Run Custom Simulation")
 
-    # network = repairNetwork(network, 5)
-    # printNetwork(network, "Post-Repair")
-    # n = 0
-    # for computer in network:
-    #     if computer.virus == True:
-    #         n+=1
-    # print(n)
+        strInput = input()
+        if (strInput=="1"):
+            n = int(input("Number of trials: "))
+            monteCarlo(n)
+            break
+        elif (strInput=="2"):
+            networkSize = int(input("Number Of Computers: "))
+            p = float(input("Proability of Virus spreading: "))
+            repairs = int(input("Number of repairs made: "))
+            n = int(input("Number of trials: "))
+            monteCarlo(n=n, networkSize=networkSize, p=p, numberOfRepairs=repairs)
+            break
 
 
 
