@@ -107,9 +107,9 @@ def monteCarlo(n, networkSize=20, p=0.1, numberOfRepairs=5):
                 meanInfect += 1 # add to stat C
                 
                 counter += 1
-                if (counter == networkSize): # if all computers have been infected
-                    infectedAtLeastOnce += 1
 
+        if (counter == networkSize): # if all computers have been infected
+            infectedAtLeastOnce += 1
 
 
     
